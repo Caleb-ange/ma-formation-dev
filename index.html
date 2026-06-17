@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ma Feuille de Route — Zéro → Développeur</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0efea;
+  --text:#1a1a18;--text2:#6b6b66;--text3:#9b9b96;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.08);
+  --purple-light:#EEEDFE;--purple:#7F77DD;--purple-dark:#3C3489;
+  --teal-light:#E1F5EE;--teal:#1D9E75;--teal-dark:#0F6E56;
+  --amber-light:#FAEEDA;--amber:#EF9F27;--amber-dark:#854F0B;
+  --coral-light:#FAECE7;--coral:#D85A30;--coral-dark:#993C1D;
+  --radius:10px;--radius-lg:14px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;
+  --text:#e8e8e2;--text2:#9b9b96;--text3:#6b6b66;
+  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.06);
+  --purple-light:#26215C;--purple-dark:#AFA9EC;
+  --teal-light:#04342C;--teal-dark:#5DCAA5;
+  --amber-light:#412402;--amber-dark:#EF9F27;
+  --coral-light:#4A1B0C;--coral-dark:#F0997B;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:"SF Mono",Monaco,Consolas,monospace;font-size:13px;background:var(--bg3);padding:2px 6px;border-radius:4px;border:0.5px solid var(--border)}
+
+/* Layout */
+.sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background:var(--bg2);border-right:0.5px solid var(--border);overflow-y:auto;padding:20px 0;z-index:100}
+.main{margin-left:240px;padding:32px 40px;max-width:860px}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:16px}}
+
+/* Sidebar */
+.sidebar-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:0 16px;margin-bottom:8px;margin-top:16px}
+.sidebar-title:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 16px;cursor:pointer;font-size:13px;color:var(--text2);border-radius:0;transition:all .15s;text-decoration:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--purple-light);color:var(--purple-dark);font-weight:500}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .2s}
+.nav-item.done .nav-dot{background:var(--teal)}
+.nav-item.active .nav-dot{background:var(--purple)}
+.sidebar-progress{padding:12px 16px;margin-top:auto}
+.progress-label{font-size:12px;color:var(--text2);display:flex;justify-content:space-between;margin-bottom:6px}
+.progress-track{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .4s}
+
+/* Header */
+.page-header{margin-bottom:32px;padding-bottom:24px;border-bottom:0.5px solid var(--border)}
+.page-header h1{font-size:26px;font-weight:600;margin-bottom:6px}
+.page-header p{color:var(--text2);font-size:15px}
+.header-stats{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap}
+.stat-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 16px;text-align:center;min-width:90px}
+.stat-num{font-size:22px;font-weight:600;display:block}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+.stat-purple{color:var(--purple)}
+.stat-teal{color:var(--teal)}
+.stat-amber{color:var(--amber)}
+
+/* Phase sections */
+.phase-section{display:none}
+.phase-section.active{display:block}
+.phase-header-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px}
+.phase-header-card h2{font-size:20px;font-weight:600;margin-bottom:4px}
+.phase-header-card p{color:var(--text2);font-size:14px;margin-bottom:12px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px}
+.tag-purple{background:var(--purple-light);color:var(--purple-dark)}
+.tag-teal{background:var(--teal-light);color:var(--teal-dark)}
+.tag-amber{background:var(--amber-light);color:var(--amber-dark)}
+.tag-coral{background:var(--coral-light);color:var(--coral-dark)}
+
+/* Week cards */
+.week-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
+.week-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.week-header{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none}
+.week-header:hover{background:var(--bg2)}
+.week-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.wn-purple{background:var(--purple-light);color:var(--purple-dark)}
+.wn-teal{background:var(--teal-light);color:var(--teal-dark)}
+.wn-amber{background:var(--amber-light);color:var(--amber-dark)}
+.wn-coral{background:var(--coral-light);color:var(--coral-dark)}
+.week-title{flex:1;font-weight:500;font-size:15px}
+.week-progress{font-size:12px;color:var(--text3);margin-right:4px}
+.week-arrow{color:var(--text3);font-size:18px;transition:transform .2s;line-height:1}
+.week-arrow.open{transform:rotate(90deg)}
+.week-body{display:none;padding:0 18px 18px;border-top:0.5px solid var(--border2)}
+.week-body.open{display:block}
+
+/* Section labels */
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:16px 0 8px}
+
+/* Skills pills */
+.skills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.skill{font-size:12px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--border);color:var(--text2)}
+
+/* Resources */
+.resources{list-style:none}
+.resource{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--border2);font-size:14px}
+.resource:last-child{border-bottom:none}
+.res-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:600;margin-top:1px}
+.ri-yt{background:var(--coral-light);color:var(--coral-dark)}
+.ri-web{background:var(--teal-light);color:var(--teal-dark)}
+.ri-proj{background:var(--purple-light);color:var(--purple-dark)}
+.ri-ai{background:var(--amber-light);color:var(--amber-dark)}
+.resource-content strong{font-weight:500}
+.resource-content a{font-size:13px;color:var(--teal);display:block;margin-top:1px}
+
+/* Boxes */
+.exercise-box{background:var(--bg2);border-left:3px solid var(--purple);border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.65}
+.exercise-box strong{font-weight:600;display:block;margin-bottom:6px;font-size:15px}
+.quiz-box{background:var(--bg2);border-left:3px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;margin:12px 0;font-size:14px}
+.quiz-box strong{font-weight:600;display:block;margin-bottom:8px}
+.ai-tip{background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;margin:12px 0;font-size:14px;line-height:1.65}
+.ai-tip strong{font-weight:600;display:block;margin-bottom:6px}
+
+/* Checklist */
+.checklist{list-style:none;margin:4px 0}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;cursor:pointer;font-size:14px;line-height:1.5;border-bottom:0.5px solid var(--border2)}
+.check-item:last-child{border-bottom:none}
+.check-item:hover .check-box{border-color:var(--teal)}
+.check-box{width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;margin-top:1px}
+.check-box.done{background:var(--teal);border-color:var(--teal);color:#fff}
+.check-item.done-item .check-text{color:var(--text3);text-decoration:line-through}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:0.5px solid var(--border);border-radius:var(--radius);font-size:13px;cursor:pointer;background:var(--bg);color:var(--text);font-family:inherit;transition:all .15s;margin-top:8px;margin-right:8px}
+.btn:hover{background:var(--bg3)}
+.btn-primary{background:var(--purple-light);color:var(--purple-dark);border-color:transparent}
+.btn-primary:hover{opacity:.85}
+
+/* Specialization cards */
+.spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:16px 0}
+.spec-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;cursor:pointer;transition:all .15s}
+.spec-card:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(127,119,221,.15)}
+.spec-icon{font-size:32px;margin-bottom:10px}
+.spec-title{font-weight:600;font-size:16px;margin-bottom:6px}
+.spec-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.spec-pro{font-size:12px;color:var(--teal);margin-bottom:3px}
+.spec-con{font-size:12px;color:var(--text3)}
+
+/* Mentor box */
+.mentor-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin:16px 0}
+.mentor-box h3{font-size:16px;font-weight:600;margin-bottom:12px}
+.mentor-row{display:flex;align-items:flex-start;gap:10px;margin:8px 0;font-size:14px;line-height:1.5}
+.mentor-num{width:22px;height:22px;border-radius:50%;background:var(--amber-light);color:var(--amber-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
+
+/* Context banner */
+.context-banner{background:var(--teal-light);border:0.5px solid var(--teal);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:14px;display:none}
+.context-banner.show{display:block}
+.context-banner strong{color:var(--teal-dark);font-weight:600}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:var(--radius);font-size:13px;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* Week done badge */
+.week-done-badge{font-size:11px;background:var(--teal-light);color:var(--teal-dark);padding:2px 8px;border-radius:10px;font-weight:500}
+
+hr{border:none;border-top:0.5px solid var(--border);margin:20px 0}
+
+@media(max-width:768px){.spec-grid{grid-template-columns:1fr}.header-stats{gap:10px}.stat-card{min-width:70px;padding:8px 12px}}
+</style>
+</head>
+<body>
+
+<!-- Sidebar navigation -->
+<nav class="sidebar">
+  <div style="padding:16px 16px 0;border-bottom:0.5px solid var(--border2);padding-bottom:16px;margin-bottom:8px">
+    <div style="font-size:15px;font-weight:600">🎯 Ma formation dev</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:2px" id="sidebar-date"></div>
+  </div>
+
+  <div class="sidebar-title">Phase 1 — Bases</div>
+  <a class="nav-item active" onclick="showSection('phase1')" id="nav-phase1"><span class="nav-dot"></span>Semaines 1–6 : Python & Terminal</a>
+
+  <div class="sidebar-title">Phase 2 — Web</div>
+  <a class="nav-item" onclick="showSection('phase2')" id="nav-phase2"><span class="nav-dot"></span>S7 : Git & GitHub</a>
+  <a class="nav-item" onclick="showSection('phase3')" id="nav-phase3"><span class="nav-dot"></span>S8–S9 : HTML & CSS</a>
+  <a class="nav-item" onclick="showSection('phase4')" id="nav-phase4"><span class="nav-dot"></span>S10–S12 : JavaScript</a>
+  <a class="nav-item" onclick="showSection('phase5')" id="nav-phase5"><span class="nav-dot"></span>S13–S14 : Algorithmes</a>
+
+  <div class="sidebar-title">Phase 3 — Spécialisation</div>
+  <a class="nav-item" onclick="showSection('phase6')" id="nav-phase6"><span class="nav-dot"></span>S15–S22 : Voie choisie</a>
+
+  <div class="sidebar-title">Phase 4 — Projet final</div>
+  <a class="nav-item" onclick="showSection('phase7')" id="nav-phase7"><span class="nav-dot"></span>S23–S26 : Portfolio</a>
+
+  <div class="sidebar-title">Guides</div>
+  <a class="nav-item" onclick="showSection('guide-voie')" id="nav-guide-voie"><span class="nav-dot"></span>Choisir ta spécialisation</a>
+  <a class="nav-item" onclick="showSection('guide-ia')" id="nav-guide-ia"><span class="nav-dot"></span>Utiliser l'IA efficacement</a>
+
+  <div style="padding:16px;margin-top:16px;border-top:0.5px solid var(--border2)">
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progression globale</div>
+    <div class="progress-track"><div class="progress-fill" id="global-progress" style="width:0%"></div></div>
+    <div style="font-size:12px;color:var(--text2);margin-top:6px" id="progress-label">0 tâches complétées</div>
+  </div>
+</nav>
+
+<!-- Main content -->
+<main class="main">
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Context banner for Claude -->
+  <div class="context-banner" id="context-banner">
+    <strong>💬 Contexte pour Claude :</strong> <span id="context-text"></span>
+  </div>
+
+  <!-- ============ PAGE HEADER ============ -->
+  <div class="page-header">
+    <h1>Zéro → Développeur en 6 mois</h1>
+    <p>Ta feuille de route personnalisée · Progression sauvegardée automatiquement dans ce navigateur</p>
+    <div class="header-stats">
+      <div class="stat-card"><span class="stat-num stat-purple" id="stat-tasks">0</span><span class="stat-label">Tâches faites</span></div>
+      <div class="stat-card"><span class="stat-num stat-teal" id="stat-weeks">0</span><span class="stat-label">Semaines finies</span></div>
+      <div class="stat-card"><span class="stat-num stat-amber" id="stat-days">0</span><span class="stat-label">Jours depuis début</span></div>
+      <div class="stat-card">
+        <select style="font-size:13px;font-weight:500;border:none;background:transparent;color:var(--text);font-family:inherit;cursor:pointer;outline:none" id="voie-select" onchange="saveVoie(this.value)">
+          <option value="">Voie ?</option>
+          <option value="web">🌐 Web</option>
+          <option value="mobile">📱 Mobile</option>
+          <option value="cyber">🔒 Cyber</option>
+        </select>
+        <span class="stat-label">Ma spécialisation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 1 ============ -->
+  <div class="phase-section active" id="phase1">
+    <div class="phase-header-card">
+      <h2>Phase 1 — Fondations de l'informatique</h2>
+      <p>Semaines 1 à 6 · ~1h30 par jour · Ton point de départ</p>
+      <div class="tags">
+        <span class="tag tag-purple">Débutant absolu</span>
+        <span class="tag tag-teal">Terminal · Python · Logique</span>
+        <span class="tag tag-amber">Objectif : penser comme un dev</span>
+      </div>
+    </div>
+
+    <!-- S1 -->
+    <div class="week-card" id="wcard-s1">
+      <div class="week-header" onclick="toggleWeek('s1')">
+        <div class="week-num wn-purple">S1</div>
+        <div class="week-title">Comment fonctionne un ordinateur & terminal</div>
+        <span class="week-progress" id="wprog-s1"></span>
+        <div class="week-arrow" id="warr-s1">›</div>
+      </div>
+      <div class="week-body" id="wbody-s1">
+        <div class="section-label">Compétences à valider</div>
+        <div class="skills">
+          <span class="skill">CPU, RAM, stockage</span>
+          <span class="skill">Système d'exploitation</span>
+          <span class="skill">Fichiers & dossiers</span>
+          <span class="skill">Terminal : 10 commandes</span>
+        </div>
+        <div class="section-label">Ressources gratuites</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-yt">YT</span><div class="resource-content"><strong>Grafikart FR</strong> — "Comment fonctionne un ordinateur" (30 min)<a href="https://www.youtube.com/@grafikart-fr" target="_blank">youtube.com/@grafikart-fr →</a></div></li>
+          <li class="resource"><span class="res-icon ri-web">CS</span><div class="resource-content"><strong>CS50 Semaine 0</strong> — Harvard, sous-titres FR<a href="https://cs50.harvard.edu/x" target="_blank">cs50.harvard.edu →</a></div></li>
+          <li class="resource"><span class="res-icon ri-web">SH</span><div class="resource-content"><strong>Terminal interactif</strong> — exercices dans le navigateur<a href="https://learnshell.org" target="_blank">learnshell.org →</a></div></li>
+        </ul>
+        <div class="section-label">Exercice pratique</div>
+        <div class="exercise-box">
+          <strong>🛠 Découverte du terminal</strong>
+          Ouvre un terminal et exécute ces commandes une par une. Note ce que chacune fait :<br><br>
+          <code>pwd</code> · <code>ls</code> · <code>cd Desktop</code> · <code>mkdir mon-premier-dossier</code> · <code>touch fichier.txt</code> · <code>echo "Bonjour" > fichier.txt</code> · <code>cat fichier.txt</code><br><br>
+          ✅ Validation : tu peux créer un fichier texte et lire son contenu depuis le terminal.
+        </div>
+        <div class="ai-tip">
+          <strong>💡 Quand me poser une question</strong>
+          Si une commande plante : <em>"J'ai tapé [commande], j'ai eu cette erreur : [texte], qu'est-ce que ça veut dire ?"</em>
+        </div>
+        <div class="section-label">Cases à cocher — coche quand c'est vraiment maîtrisé</div>
+        <ul class="checklist" id="cl-s1">
+          <li class="check-item" onclick="toggleCheck(this,'s1-0')"><div class="check-box" id="s1-0"></div><span class="check-text">J'ai regardé la vidéo sur le fonctionnement d'un ordi</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1-1')"><div class="check-box" id="s1-1"></div><span class="check-text">J'ai suivi CS50 Semaine 0</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1-2')"><div class="check-box" id="s1-2"></div><span class="check-text">Je connais 7 commandes terminal par cœur</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1-3')"><div class="check-box" id="s1-3"></div><span class="check-text">J'ai créé et lu un fichier depuis le terminal</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="week-card" id="wcard-s2">
+      <div class="week-header" onclick="toggleWeek('s2')">
+        <div class="week-num wn-purple">S2</div>
+        <div class="week-title">Python — variables, types, conditions</div>
+        <span class="week-progress" id="wprog-s2"></span>
+        <div class="week-arrow" id="warr-s2">›</div>
+      </div>
+      <div class="week-body" id="wbody-s2">
+        <div class="section-label">Compétences à valider</div>
+        <div class="skills">
+          <span class="skill">Variables & types</span><span class="skill">if / elif / else</span><span class="skill">print() & input()</span><span class="skill">Premier programme Python</span>
+        </div>
+        <div class="section-label">Ressources gratuites</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">OC</span><div class="resource-content"><strong>OpenClassrooms</strong> — "Apprenez à programmer en Python" (Parties 1 & 2)<a href="https://openclassrooms.com/fr/courses/7168871-apprenez-les-bases-du-langage-python" target="_blank">openclassrooms.com →</a></div></li>
+          <li class="resource"><span class="res-icon ri-yt">YT</span><div class="resource-content"><strong>Docstring FR</strong> — "Python pour débutants" (playlist)<a href="https://www.youtube.com/@Docstring" target="_blank">youtube.com/@Docstring →</a></div></li>
+          <li class="resource"><span class="res-icon ri-proj">▶</span><div class="resource-content"><strong>Pratique en ligne</strong> — aucune installation requise<a href="https://replit.com" target="_blank">replit.com →</a></div></li>
+        </ul>
+        <div class="exercise-box">
+          <strong>🛠 Exercice : calculatrice IMC</strong>
+          Écris un programme qui demande le poids (kg) et la taille (m), calcule l'IMC (poids ÷ taille²), et affiche : Sous-poids / Poids normal / Surpoids / Obésité.<br><br>
+          ✅ Validation : fonctionne avec 3 valeurs différentes.
+        </div>
+        <div class="ai-tip">
+          <strong>💡 Pour déboguer avec moi</strong>
+          <em>"Voici mon code [colle le code]. J'ai cette erreur : [erreur]. Explique-moi comme si j'avais 15 ans et montre-moi la correction commentée."</em>
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s2-0')"><div class="check-box" id="s2-0"></div><span class="check-text">Je comprends la différence entre int, float et str</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2-1')"><div class="check-box" id="s2-1"></div><span class="check-text">J'ai écrit un programme avec if/elif/else</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2-2')"><div class="check-box" id="s2-2"></div><span class="check-text">J'ai réussi l'exercice IMC</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2-3')"><div class="check-box" id="s2-3"></div><span class="check-text">Je peux expliquer chaque ligne de mon code</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="week-card" id="wcard-s3">
+      <div class="week-header" onclick="toggleWeek('s3')">
+        <div class="week-num wn-purple">S3</div>
+        <div class="week-title">Boucles & fonctions</div>
+        <span class="week-progress" id="wprog-s3"></span>
+        <div class="week-arrow" id="warr-s3">›</div>
+      </div>
+      <div class="week-body" id="wbody-s3">
+        <div class="section-label">Compétences à valider</div>
+        <div class="skills">
+          <span class="skill">for / while</span><span class="skill">Listes</span><span class="skill">def + paramètres</span><span class="skill">return</span>
+        </div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">EX</span><div class="resource-content"><strong>Exercism.io</strong> — piste Python, exercices corrigés par la communauté<a href="https://exercism.org/tracks/python" target="_blank">exercism.org →</a></div></li>
+          <li class="resource"><span class="res-icon ri-yt">YT</span><div class="resource-content"><strong>Graven FR</strong> — "Les fonctions Python expliquées"<a href="https://www.youtube.com/@Graven" target="_blank">youtube.com/@Graven →</a></div></li>
+        </ul>
+        <div class="exercise-box">
+          <strong>🛠 Jeu de devinette</strong>
+          L'ordi tire un nombre aléatoire (1–100). L'utilisateur doit le trouver. Le programme dit "trop grand" / "trop petit" et compte les essais.<br><br>
+          Utilise : <code>import random</code>, une boucle <code>while</code>, et une fonction <code>verifier(guess, secret)</code>.<br><br>
+          ✅ Validation : le jeu fonctionne jusqu'à la bonne réponse.
+        </div>
+        <div class="quiz-box">
+          <strong>🎯 Quiz de validation S3</strong>
+          Copie ce message dans Claude :<br>
+          <code style="display:block;margin-top:8px;padding:10px;font-size:12px;line-height:1.5">Quiz semaine 3 Python : pose-moi 5 questions sur les boucles for/while et les fonctions. Attends mes réponses une par une, corrige-moi et explique pourquoi.</code>
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s3-0')"><div class="check-box" id="s3-0"></div><span class="check-text">Je maîtrise for et while</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s3-1')"><div class="check-box" id="s3-1"></div><span class="check-text">J'ai créé des fonctions avec paramètres et return</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s3-2')"><div class="check-box" id="s3-2"></div><span class="check-text">J'ai réussi le jeu de devinette</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s3-3')"><div class="check-box" id="s3-3"></div><span class="check-text">J'ai validé le quiz S3</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="week-card" id="wcard-s4">
+      <div class="week-header" onclick="toggleWeek('s4')">
+        <div class="week-num wn-purple">S4</div>
+        <div class="week-title">Structures de données — listes & dictionnaires</div>
+        <span class="week-progress" id="wprog-s4"></span>
+        <div class="week-arrow" id="warr-s4">›</div>
+      </div>
+      <div class="week-body" id="wbody-s4">
+        <div class="skills">
+          <span class="skill">Listes & index</span><span class="skill">Dictionnaires</span><span class="skill">Tuples & sets</span><span class="skill">Manipulation de données</span>
+        </div>
+        <div class="exercise-box">
+          <strong>🛠 Carnet de contacts</strong>
+          Mini-carnet en ligne de commande : ajouter un contact {nom, téléphone, email}, rechercher par nom, afficher tous, supprimer. Utilise un dictionnaire + des fonctions.
+        </div>
+        <div class="ai-tip">
+          <strong>💡 Astuce IA</strong>
+          <em>"Génère-moi 10 contacts fictifs sous forme de liste Python pour tester mon carnet."</em>
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s4-0')"><div class="check-box" id="s4-0"></div><span class="check-text">Je manipule listes et dictionnaires sans regarder la doc</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s4-1')"><div class="check-box" id="s4-1"></div><span class="check-text">Le carnet de contacts fonctionne</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s4-2')"><div class="check-box" id="s4-2"></div><span class="check-text">J'ai testé avec 5+ contacts fictifs</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="week-card" id="wcard-s5">
+      <div class="week-header" onclick="toggleWeek('s5')">
+        <div class="week-num wn-purple">S5</div>
+        <div class="week-title">Fichiers, erreurs & bibliothèques</div>
+        <span class="week-progress" id="wprog-s5"></span>
+        <div class="week-arrow" id="warr-s5">›</div>
+      </div>
+      <div class="week-body" id="wbody-s5">
+        <div class="skills">
+          <span class="skill">Lire/écrire fichiers</span><span class="skill">try / except</span><span class="skill">import & modules</span><span class="skill">pip install</span>
+        </div>
+        <div class="exercise-box">
+          <strong>🛠 Carnet de contacts persistant</strong>
+          Reprends le carnet S4 et sauvegarde les données dans un fichier JSON. Au lancement, le programme charge les contacts existants. Gère les erreurs si le fichier n'existe pas encore.
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s5-0')"><div class="check-box" id="s5-0"></div><span class="check-text">Je sais lire et écrire un fichier JSON</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s5-1')"><div class="check-box" id="s5-1"></div><span class="check-text">J'utilise try/except pour gérer les erreurs</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s5-2')"><div class="check-box" id="s5-2"></div><span class="check-text">Le carnet sauvegarde et recharge les données</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s5-3')"><div class="check-box" id="s5-3"></div><span class="check-text">J'ai installé une bibliothèque avec pip</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- S6 -->
+    <div class="week-card" id="wcard-s6">
+      <div class="week-header" onclick="toggleWeek('s6')">
+        <div class="week-num wn-purple">S6</div>
+        <div class="week-title">Bilan Phase 1 — mini-projet To-Do List</div>
+        <span class="week-progress" id="wprog-s6"></span>
+        <div class="week-arrow" id="warr-s6">›</div>
+      </div>
+      <div class="week-body" id="wbody-s6">
+        <div class="exercise-box">
+          <strong>🚀 Projet : application To-Do List complète</strong>
+          Crée une To-Do list en ligne de commande avec : ajout de tâches, marquage comme terminée, affichage par priorité (haute/moyenne/basse), sauvegarde JSON. C'est ton premier vrai projet complet !
+        </div>
+        <div class="quiz-box">
+          <strong>🎯 Bilan Phase 1 — copie ce message dans Claude</strong>
+          <code style="display:block;margin-top:8px;padding:10px;font-size:12px;line-height:1.5">Je termine la Phase 1 Python. Fais-moi un bilan : pose-moi 10 questions couvrant terminal, variables, boucles, fonctions, listes, dictionnaires et fichiers JSON. Note mes réponses et dis-moi si je suis prêt pour la Phase 2.</code>
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s6-0')"><div class="check-box" id="s6-0"></div><span class="check-text">La To-Do List est fonctionnelle</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s6-1')"><div class="check-box" id="s6-1"></div><span class="check-text">J'ai passé le bilan Phase 1 avec Claude</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s6-2')"><div class="check-box" id="s6-2"></div><span class="check-text">Je me sens prêt à passer à la Phase 2</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 2 — GIT ============ -->
+  <div class="phase-section" id="phase2">
+    <div class="phase-header-card">
+      <h2>Git & GitHub — Semaine 7</h2>
+      <p>Versionner son code comme un professionnel</p>
+      <div class="tags"><span class="tag tag-teal">Indispensable dans tous les métiers</span><span class="tag tag-amber">Premier projet public !</span></div>
+    </div>
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('s7')">
+        <div class="week-num wn-teal">S7</div>
+        <div class="week-title">Git & GitHub</div>
+        <span class="week-progress" id="wprog-s7"></span>
+        <div class="week-arrow" id="warr-s7">›</div>
+      </div>
+      <div class="week-body" id="wbody-s7">
+        <div class="skills">
+          <span class="skill">git init / clone</span><span class="skill">add / commit / push</span><span class="skill">Branches & merge</span><span class="skill">GitHub profil public</span>
+        </div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>learngitbranching.js.org</strong> — visualise les branches en temps réel<a href="https://learngitbranching.js.org/?locale=fr_FR" target="_blank">learngitbranching.js.org →</a></div></li>
+          <li class="resource"><span class="res-icon ri-yt">YT</span><div class="resource-content"><strong>"Git en 30 minutes"</strong> — Fireship (sous-titres FR disponibles)</div></li>
+          <li class="resource"><span class="res-icon ri-web">GH</span><div class="resource-content"><strong>Docs GitHub FR</strong><a href="https://docs.github.com/fr" target="_blank">docs.github.com/fr →</a></div></li>
+        </ul>
+        <div class="exercise-box">
+          <strong>🛠 Publie ton carnet de contacts sur GitHub</strong>
+          1. Crée un compte sur github.com<br>
+          2. Crée un dépôt public nommé <code>carnet-contacts-python</code><br>
+          3. Pousse ton code de la semaine 5<br>
+          4. Écris un README.md (description, installation, utilisation)<br><br>
+          ✅ Validation : un lien GitHub public fonctionnel
+        </div>
+        <div class="ai-tip">
+          <strong>💡 IA pour le README</strong>
+          <em>"Voici mon code Python [colle le code]. Aide-moi à écrire un README.md professionnel avec description, installation, utilisation et exemple de sortie."</em>
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s7-0')"><div class="check-box" id="s7-0"></div><span class="check-text">J'ai un compte GitHub créé</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s7-1')"><div class="check-box" id="s7-1"></div><span class="check-text">Je maîtrise git add, commit, push</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s7-2')"><div class="check-box" id="s7-2"></div><span class="check-text">Mon projet est publié sur GitHub</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s7-3')"><div class="check-box" id="s7-3"></div><span class="check-text">Mon README est rédigé proprement</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s7-4')"><div class="check-box" id="s7-4"></div><span class="check-text">Je comprends l'utilité des branches</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 2 — HTML/CSS ============ -->
+  <div class="phase-section" id="phase3">
+    <div class="phase-header-card">
+      <h2>HTML & CSS — Semaines 8–9</h2>
+      <p>Construire et styliser ta première page web</p>
+      <div class="tags"><span class="tag tag-teal">Résultats visibles immédiatement</span><span class="tag tag-purple">Projet : page de présentation publiée</span></div>
+    </div>
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('s89')">
+        <div class="week-num wn-teal">S8–9</div>
+        <div class="week-title">HTML & CSS — structure et style</div>
+        <span class="week-progress" id="wprog-s89"></span>
+        <div class="week-arrow" id="warr-s89">›</div>
+      </div>
+      <div class="week-body" id="wbody-s89">
+        <div class="skills">
+          <span class="skill">Structure HTML5</span><span class="skill">Sélecteurs CSS</span><span class="skill">Flexbox & Grid</span><span class="skill">Responsive design</span><span class="skill">GitHub Pages</span>
+        </div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>The Odin Project</strong> — parcours HTML/CSS (référence mondiale, gratuit)<a href="https://www.theodinproject.com/paths/foundations" target="_blank">theodinproject.com →</a></div></li>
+          <li class="resource"><span class="res-icon ri-yt">YT</span><div class="resource-content"><strong>Kevin Powell</strong> — meilleur prof CSS du monde (EN, sous-titres auto FR)</div></li>
+          <li class="resource"><span class="res-icon ri-web">MDN</span><div class="resource-content"><strong>MDN Web Docs FR</strong> — la référence absolue du développeur web<a href="https://developer.mozilla.org/fr" target="_blank">developer.mozilla.org/fr →</a></div></li>
+        </ul>
+        <div class="exercise-box">
+          <strong>🚀 Projet : ta page de présentation personnelle</strong>
+          Crée une page HTML/CSS qui te présente : photo ou avatar, bio, tes compétences en cours, tes projets Python avec liens GitHub. Doit être responsive (lisible sur mobile). Publie sur <strong>GitHub Pages</strong> (100% gratuit).<br><br>
+          ✅ Validation : une URL public accessible depuis ton téléphone
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s89-0')"><div class="check-box" id="s89-0"></div><span class="check-text">Je comprends la structure HTML5 (head, body, balises sémantiques)</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s89-1')"><div class="check-box" id="s89-1"></div><span class="check-text">Je maîtrise Flexbox pour aligner des éléments</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s89-2')"><div class="check-box" id="s89-2"></div><span class="check-text">Ma page est responsive (testée sur mobile)</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s89-3')"><div class="check-box" id="s89-3"></div><span class="check-text">Ma page est publiée sur GitHub Pages</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 2 — JavaScript ============ -->
+  <div class="phase-section" id="phase4">
+    <div class="phase-header-card">
+      <h2>JavaScript — Semaines 10–12</h2>
+      <p>Rendre tes pages interactives</p>
+      <div class="tags"><span class="tag tag-teal">Le langage du web</span><span class="tag tag-purple">Projet : To-Do List dans le navigateur</span></div>
+    </div>
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('s1012')">
+        <div class="week-num wn-teal">S10–12</div>
+        <div class="week-title">JavaScript — DOM, événements, APIs</div>
+        <span class="week-progress" id="wprog-s1012"></span>
+        <div class="week-arrow" id="warr-s1012">›</div>
+      </div>
+      <div class="week-body" id="wbody-s1012">
+        <div class="skills">
+          <span class="skill">Variables & types JS</span><span class="skill">DOM manipulation</span><span class="skill">Événements</span><span class="skill">fetch() & APIs</span><span class="skill">localStorage</span>
+        </div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">JS</span><div class="resource-content"><strong>javascript.info</strong> — le meilleur cours JS gratuit (version FR disponible)<a href="https://fr.javascript.info" target="_blank">fr.javascript.info →</a></div></li>
+          <li class="resource"><span class="res-icon ri-proj">30</span><div class="resource-content"><strong>JavaScript30</strong> — 30 projets JS en 30 jours, par Wes Bos (100% gratuit)<a href="https://javascript30.com" target="_blank">javascript30.com →</a></div></li>
+          <li class="resource"><span class="res-icon ri-web">MDN</span><div class="resource-content"><strong>MDN — Guide JavaScript</strong><a href="https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide" target="_blank">developer.mozilla.org/fr →</a></div></li>
+        </ul>
+        <div class="exercise-box">
+          <strong>🚀 Projet : To-Do List interactive</strong>
+          Recrée ta To-Do list Python mais dans le navigateur, en JavaScript. Boutons pour ajouter/supprimer/cocher des tâches. Sauvegarde dans localStorage. Design CSS propre.<br><br>
+          C'est le même projet qu'en S6, mais dans le web — tu verras directement ta progression !
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s1012-0')"><div class="check-box" id="s1012-0"></div><span class="check-text">Je manipule le DOM (getElementById, querySelector...)</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1012-1')"><div class="check-box" id="s1012-1"></div><span class="check-text">Je gère les événements (click, input, submit)</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1012-2')"><div class="check-box" id="s1012-2"></div><span class="check-text">J'ai utilisé fetch() pour appeler une API</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1012-3')"><div class="check-box" id="s1012-3"></div><span class="check-text">La To-Do List JS est publiée sur GitHub Pages</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 2 — Algos ============ -->
+  <div class="phase-section" id="phase5">
+    <div class="phase-header-card">
+      <h2>Algorithmes & logique — Semaines 13–14</h2>
+      <p>Penser de façon structurée · Résoudre des problèmes efficacement</p>
+      <div class="tags"><span class="tag tag-purple">Fondations pour toutes les voies</span></div>
+    </div>
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('s1314')">
+        <div class="week-num wn-teal">S13–14</div>
+        <div class="week-title">Algorithmes de base & pensée computationnelle</div>
+        <span class="week-progress" id="wprog-s1314"></span>
+        <div class="week-arrow" id="warr-s1314">›</div>
+      </div>
+      <div class="week-body" id="wbody-s1314">
+        <div class="skills">
+          <span class="skill">Tri (bubble, selection)</span><span class="skill">Recherche binaire</span><span class="skill">Récursivité</span><span class="skill">Complexité O(n)</span>
+        </div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>Visualgo.net</strong> — visualise les algorithmes en animation temps réel<a href="https://visualgo.net/fr" target="_blank">visualgo.net/fr →</a></div></li>
+          <li class="resource"><span class="res-icon ri-web">CW</span><div class="resource-content"><strong>Codewars.com</strong> — défis algorithmiques niveau 8–6 kyu (parfait pour débuter)<a href="https://www.codewars.com" target="_blank">codewars.com →</a></div></li>
+          <li class="resource"><span class="res-icon ri-web">CS</span><div class="resource-content"><strong>CS50 Semaines 3 & 4</strong> — algorithmes expliqués visuellement par Harvard<a href="https://cs50.harvard.edu/x" target="_blank">cs50.harvard.edu →</a></div></li>
+        </ul>
+        <div class="ai-tip">
+          <strong>💡 IA pour les algos — la bonne façon</strong>
+          Ne demande jamais la solution directement. Dis : <em>"Voici le problème Codewars : [énoncé]. Je ne vois pas comment l'aborder. Donne-moi seulement un indice sur la stratégie, pas le code."</em>
+        </div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s1314-0')"><div class="check-box" id="s1314-0"></div><span class="check-text">Je comprends et implémente le tri par bulles</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1314-1')"><div class="check-box" id="s1314-1"></div><span class="check-text">Je comprends la recherche binaire</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1314-2')"><div class="check-box" id="s1314-2"></div><span class="check-text">J'ai écrit une fonction récursive (factorielle ou Fibonacci)</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s1314-3')"><div class="check-box" id="s1314-3"></div><span class="check-text">J'ai résolu 5+ défis sur Codewars</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 3 ============ -->
+  <div class="phase-section" id="phase6">
+    <div class="phase-header-card">
+      <h2>Phase 3 — Spécialisation (S15–S22)</h2>
+      <p>Tu as choisi ta voie ? Va dans l'onglet "Choisir ta spécialisation" si tu hésites encore.</p>
+      <div class="tags">
+        <span class="tag tag-coral">Voie Web (React + Node)</span>
+        <span class="tag tag-teal">Voie Mobile (React Native)</span>
+        <span class="tag tag-purple">Voie Cybersécurité</span>
+      </div>
+    </div>
+
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('sp-web')">
+        <div class="week-num wn-coral">🌐</div>
+        <div class="week-title">Voie Web — React + Node.js + SQL</div>
+        <span class="week-progress" id="wprog-sp-web"></span>
+        <div class="week-arrow" id="warr-sp-web">›</div>
+      </div>
+      <div class="week-body" id="wbody-sp-web">
+        <div class="skills"><span class="skill">React (composants, hooks)</span><span class="skill">Node.js + Express</span><span class="skill">API REST</span><span class="skill">SQL / PostgreSQL</span><span class="skill">Déploiement Vercel</span></div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>Full Stack Open</strong> — université Helsinki, le meilleur cours fullstack gratuit (FR)<a href="https://fullstackopen.com/fr/" target="_blank">fullstackopen.com/fr →</a></div></li>
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>React officiel</strong> — tutoriel interactif<a href="https://react.dev/learn" target="_blank">react.dev/learn →</a></div></li>
+        </ul>
+        <div class="exercise-box"><strong>🚀 Projet : blog fullstack</strong>Frontend React + Backend Node.js/Express + base de données SQL. CRUD sur des articles, authentification simple, déployé en ligne.</div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'spweb-0')"><div class="check-box" id="spweb-0"></div><span class="check-text">Je crée des composants React avec useState</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spweb-1')"><div class="check-box" id="spweb-1"></div><span class="check-text">Je crée une API REST avec Express</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spweb-2')"><div class="check-box" id="spweb-2"></div><span class="check-text">Je fais des requêtes SQL (SELECT, INSERT, UPDATE)</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spweb-3')"><div class="check-box" id="spweb-3"></div><span class="check-text">Mon projet est déployé sur Vercel + Render</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('sp-mobile')">
+        <div class="week-num wn-teal">📱</div>
+        <div class="week-title">Voie Mobile — React Native + Expo</div>
+        <span class="week-progress" id="wprog-sp-mobile"></span>
+        <div class="week-arrow" id="warr-sp-mobile">›</div>
+      </div>
+      <div class="week-body" id="wbody-sp-mobile">
+        <div class="skills"><span class="skill">React Native</span><span class="skill">Expo Router</span><span class="skill">State management</span><span class="skill">Firebase / Supabase</span></div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>Expo.dev</strong> — créer une app mobile en 5 minutes<a href="https://docs.expo.dev" target="_blank">docs.expo.dev →</a></div></li>
+          <li class="resource"><span class="res-icon ri-yt">YT</span><div class="resource-content"><strong>Traversy Media</strong> — "React Native Crash Course" (EN)</div></li>
+        </ul>
+        <div class="exercise-box"><strong>🚀 Projet : app météo mobile</strong>App React Native qui récupère la météo via OpenWeather API, affiche les données, sauvegarde les villes favorites. Testable via Expo Go sur ton téléphone.</div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'spmob-0')"><div class="check-box" id="spmob-0"></div><span class="check-text">Je crée des écrans avec React Native</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spmob-1')"><div class="check-box" id="spmob-1"></div><span class="check-text">Je navigue entre écrans avec Expo Router</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spmob-2')"><div class="check-box" id="spmob-2"></div><span class="check-text">L'app est testable sur mon téléphone via Expo Go</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('sp-cyber')">
+        <div class="week-num wn-purple">🔒</div>
+        <div class="week-title">Voie Cybersécurité — réseaux, Linux, CTF</div>
+        <span class="week-progress" id="wprog-sp-cyber"></span>
+        <div class="week-arrow" id="warr-sp-cyber">›</div>
+      </div>
+      <div class="week-body" id="wbody-sp-cyber">
+        <div class="skills"><span class="skill">Réseaux TCP/IP</span><span class="skill">Linux avancé</span><span class="skill">OWASP Top 10</span><span class="skill">Kali Linux</span><span class="skill">CTF</span></div>
+        <div class="section-label">Ressources</div>
+        <ul class="resources">
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>TryHackMe</strong> — parcours "Pre-Security" + "Jr Pentester" (gratuit en partie)<a href="https://tryhackme.com" target="_blank">tryhackme.com →</a></div></li>
+          <li class="resource"><span class="res-icon ri-web">↗</span><div class="resource-content"><strong>PicoCTF</strong> — challenges CTF pour débutants, Carnegie Mellon (100% gratuit)<a href="https://picoctf.org" target="_blank">picoctf.org →</a></div></li>
+          <li class="resource"><span class="res-icon ri-yt">YT</span><div class="resource-content"><strong>NetworkChuck</strong> — cybersécurité expliquée simplement (EN)</div></li>
+        </ul>
+        <div class="exercise-box"><strong>🚀 Projet : audit de sécurité DVWA</strong>Sur DVWA (Damn Vulnerable Web App) installée localement, identifie et exploite des vulnérabilités SQL injection, XSS, CSRF. Rédige un rapport d'audit structuré.</div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'spcy-0')"><div class="check-box" id="spcy-0"></div><span class="check-text">Je comprends TCP/IP, DNS, HTTP</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spcy-1')"><div class="check-box" id="spcy-1"></div><span class="check-text">J'ai terminé le parcours Pre-Security TryHackMe</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spcy-2')"><div class="check-box" id="spcy-2"></div><span class="check-text">J'ai résolu 3+ challenges PicoCTF</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'spcy-3')"><div class="check-box" id="spcy-3"></div><span class="check-text">J'ai rédigé un rapport d'audit DVWA</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 4 ============ -->
+  <div class="phase-section" id="phase7">
+    <div class="phase-header-card">
+      <h2>Phase 4 — Projet final & portfolio (S23–S26)</h2>
+      <p>Ton bilan de 6 mois · Ce que tu auras construit</p>
+      <div class="tags"><span class="tag tag-amber">5+ projets GitHub</span><span class="tag tag-teal">Portfolio en ligne</span><span class="tag tag-purple">Prêt pour la suite</span></div>
+    </div>
+    <div class="week-card">
+      <div class="week-header" onclick="toggleWeek('s2326')">
+        <div class="week-num wn-amber">S23–26</div>
+        <div class="week-title">Projet final + consolidation + plan pour la suite</div>
+        <span class="week-progress" id="wprog-s2326"></span>
+        <div class="week-arrow" id="warr-s2326">›</div>
+      </div>
+      <div class="week-body" id="wbody-s2326">
+        <div class="exercise-box">
+          <strong>🚀 Idées de projets finaux</strong>
+          <strong>Web :</strong> SaaS mini (gestion de budget, app de recettes, clone Trello simplifié)<br>
+          <strong>Mobile :</strong> App de suivi d'habitudes, tracker de sport, app lecture QR<br>
+          <strong>Cyber :</strong> Scanner de vulnérabilités réseau + rapport automatisé
+        </div>
+        <div class="section-label">Critères de qualité obligatoires</div>
+        <ul class="checklist">
+          <li class="check-item" onclick="toggleCheck(this,'s2326-0')"><div class="check-box" id="s2326-0"></div><span class="check-text">Code sur GitHub avec README professionnel</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2326-1')"><div class="check-box" id="s2326-1"></div><span class="check-text">Déployé et accessible en ligne</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2326-2')"><div class="check-box" id="s2326-2"></div><span class="check-text">Au moins 3 fonctionnalités distinctes</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2326-3')"><div class="check-box" id="s2326-3"></div><span class="check-text">Code commenté et lisible</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2326-4')"><div class="check-box" id="s2326-4"></div><span class="check-text">Tests unitaires sur les fonctions clés</span></li>
+          <li class="check-item" onclick="toggleCheck(this,'s2326-5')"><div class="check-box" id="s2326-5"></div><span class="check-text">J'ai passé le bilan final de 6 mois avec Claude</span></li>
+        </ul>
+        <div class="quiz-box">
+          <strong>🎯 Message bilan final — copie dans Claude</strong>
+          <code style="display:block;margin-top:8px;padding:10px;font-size:12px;line-height:1.5">Bilan final de mes 6 mois de formation. Évalue mes compétences : pose-moi 15 questions couvrant Python, Web (HTML/CSS/JS), Git, algorithmes et ma spécialisation. Donne-moi ensuite un bilan honnête et des recommandations concrètes pour la suite.</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GUIDE VOIE ============ -->
+  <div class="phase-section" id="guide-voie">
+    <div class="phase-header-card">
+      <h2>Choisir ta spécialisation</h2>
+      <p>Un guide objectif — pas de bonne ou mauvaise réponse</p>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <div class="spec-icon">🌐</div>
+        <div class="spec-title">Développement Web</div>
+        <div class="spec-desc">Créer des sites et applications web. Frontend, Backend, ou Fullstack (les deux).</div>
+        <div class="spec-pro">✅ Marché très large · Freelance facile · Résultats visibles · Beaucoup de ressources gratuites</div>
+        <div class="spec-con">⚠ Technologies qui évoluent vite · Concurrence mondiale</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">📱</div>
+        <div class="spec-title">Développement Mobile</div>
+        <div class="spec-desc">Apps iPhone et Android. React Native : un seul code pour les deux plateformes.</div>
+        <div class="spec-pro">✅ Tout le monde a un smartphone · Bons salaires · UX créative</div>
+        <div class="spec-con">⚠ Contraintes des stores · Tests multiplateformes · Mises à jour fréquentes</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon">🔒</div>
+        <div class="spec-title">Cybersécurité</div>
+        <div class="spec-desc">Protéger les systèmes, trouver les failles avant les hackers malveillants.</div>
+        <div class="spec-pro">✅ Pénurie de talents · Salaires élevés · Mission importante · Toujours du travail</div>
+        <div class="spec-con">⚠ Bases techniques solides requises · Certifications longues · Responsabilité légale</div>
+      </div>
+    </div>
+    <div class="mentor-box">
+      <h3>🤔 Réponds à ces 5 questions pour t'orienter</h3>
+      <div class="mentor-row"><span class="mentor-num">1</span><span>Tu aimes <strong>voir un résultat visuel rapidement</strong> ? → Penche vers Web ou Mobile</span></div>
+      <div class="mentor-row"><span class="mentor-num">2</span><span>Tu aimes <strong>résoudre des énigmes, chercher des failles cachées</strong> ? → Cybersécurité</span></div>
+      <div class="mentor-row"><span class="mentor-num">3</span><span>Tu veux <strong>travailler en freelance facilement</strong> dès le début ? → Web</span></div>
+      <div class="mentor-row"><span class="mentor-num">4</span><span>Tu veux créer <strong>des apps que tes amis utilisent sur leur téléphone</strong> ? → Mobile</span></div>
+      <div class="mentor-row"><span class="mentor-num">5</span><span>Tu t'intéresses aux <strong>banques, défense, sécurité nationale, hôpitaux</strong> ? → Cyber</span></div>
+      <hr>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:10px">Copie ce message dans Claude pour une recommandation personnalisée :</p>
+      <code style="display:block;padding:10px;font-size:12px;line-height:1.5;background:var(--bg3);border-radius:6px">Je dois choisir entre développement web, mobile et cybersécurité. Pose-moi 8 questions sur mes affinités, contraintes, objectifs pro et style d'apprentissage. Analyse mes réponses et recommande-moi la meilleure voie en justifiant ton choix.</code>
+    </div>
+  </div>
+
+  <!-- ============ GUIDE IA ============ -->
+  <div class="phase-section" id="guide-ia">
+    <div class="phase-header-card">
+      <h2>Utiliser l'IA comme un vrai mentor</h2>
+      <p>Les formules qui fonctionnent — et les erreurs à ne pas faire</p>
+    </div>
+    <div class="mentor-box">
+      <h3>✅ Les formules à copier</h3>
+      <div class="mentor-row"><span class="mentor-num">1</span><span><strong>Comprendre un concept :</strong> "Explique-moi [concept] comme si j'avais 12 ans, puis donne-moi un exemple concret en Python."</span></div>
+      <div class="mentor-row"><span class="mentor-num">2</span><span><strong>Déboguer :</strong> "Voici mon code [code] et mon erreur [erreur]. Identifie le bug, explique pourquoi il se produit, et montre-moi la correction commentée."</span></div>
+      <div class="mentor-row"><span class="mentor-num">3</span><span><strong>Se tester :</strong> "Je viens de terminer [sujet]. Pose-moi 5 questions pour valider ma compréhension. Attends mes réponses une par une."</span></div>
+      <div class="mentor-row"><span class="mentor-num">4</span><span><strong>Démarrer un projet :</strong> "Je veux créer [projet]. Aide-moi à le décomposer en étapes, en commençant par la plus simple."</span></div>
+      <div class="mentor-row"><span class="mentor-num">5</span><span><strong>Code review :</strong> "Voici mon code [code]. Joue le rôle d'un senior dev et dis-moi ce qui pourrait être amélioré, sans tout réécrire."</span></div>
+      <div class="mentor-row"><span class="mentor-num">6</span><span><strong>Débloquer :</strong> "Je bloque depuis 2h sur [problème]. Aide-moi à le décomposer par questions, sans me donner la réponse directement."</span></div>
+      <div class="mentor-row"><span class="mentor-num">7</span><span><strong>Reprendre après une pause :</strong> "Je reprends ma formation après [X jours]. Voici où j'en suis : [résumé]. Propose-moi un plan pour aujourd'hui."</span></div>
+    </div>
+    <div class="mentor-box" style="border-left:3px solid var(--coral);border-radius:0 var(--radius-lg) var(--radius-lg) 0">
+      <h3>⚠ Les erreurs à éviter</h3>
+      <div class="mentor-row"><span class="mentor-num" style="background:var(--coral-light);color:var(--coral-dark)">✗</span><span><strong>Ne pas demander :</strong> "Écris-moi tout le code du projet." → Tu ne vas rien apprendre. Demande des indices progressifs.</span></div>
+      <div class="mentor-row"><span class="mentor-num" style="background:var(--coral-light);color:var(--coral-dark)">✗</span><span><strong>Ne pas copier-coller</strong> sans comprendre. Si tu ne peux pas expliquer le code ligne par ligne, c'est trop tôt.</span></div>
+      <div class="mentor-row"><span class="mentor-num" style="background:var(--coral-light);color:var(--coral-dark)">✗</span><span><strong>Vérifier toujours</strong> les réponses techniques de l'IA avec la documentation officielle. L'IA peut se tromper.</span></div>
+    </div>
+    <div class="mentor-box">
+      <h3>💬 Donner le contexte au début de chaque session</h3>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:10px">Commence chaque conversation Claude avec ce type de message :</p>
+      <code style="display:block;padding:10px;font-size:12px;line-height:1.5;background:var(--bg3);border-radius:6px">Je suis en semaine [N] de ma formation. J'ai validé : [liste de ce que tu maîtrises]. Aujourd'hui je travaille sur [sujet]. Mon problème du moment : [problème précis]. Aide-moi.</code>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ===== Storage helpers =====
+const STORAGE_KEY = 'roadmap_progress_v1';
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch(e) { return {}; }
+}
+
+function saveData(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+// ===== Check items =====
+const data = loadData();
+
+function toggleCheck(li, id) {
+  const box = li.querySelector('.check-box');
+  const isDone = !box.classList.contains('done');
+  box.classList.toggle('done', isDone);
+  box.textContent = isDone ? '✓' : '';
+  li.classList.toggle('done-item', isDone);
+  data[id] = isDone;
+  saveData(data);
+  updateStats();
+  showToast(isDone ? '✓ Progression sauvegardée' : 'Case décochée');
+}
+
+function restoreChecks() {
+  Object.keys(data).forEach(id => {
+    if (data[id]) {
+      const box = document.getElementById(id);
+      if (box) {
+        box.classList.add('done');
+        box.textContent = '✓';
+        const li = box.closest('.check-item');
+        if (li) li.classList.add('done-item');
+      }
+    }
+  });
+}
+
+// ===== Stats =====
+function updateStats() {
+  const total = document.querySelectorAll('.check-box').length;
+  const done = document.querySelectorAll('.check-box.done').length;
+  document.getElementById('stat-tasks').textContent = done;
+  
+  // Count completed weeks (week-card with all checks done)
+  const weekCards = document.querySelectorAll('.week-card');
+  let completedWeeks = 0;
+  weekCards.forEach(card => {
+    const checks = card.querySelectorAll('.check-box');
+    if (checks.length > 0 && [...checks].every(c => c.classList.contains('done'))) {
+      completedWeeks++;
+    }
+  });
+  document.getElementById('stat-weeks').textContent = completedWeeks;
+
+  // Update sidebar week dots
+  weekCards.forEach(card => {
+    const checks = card.querySelectorAll('.check-box');
+    if (checks.length === 0) return;
+    const allDone = [...checks].every(c => c.classList.contains('done'));
+  });
+
+  // Global progress bar
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('global-progress').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = done + ' / ' + total + ' tâches (' + pct + '%)';
+
+  // Week progress labels
+  updateWeekProgress();
+}
+
+function updateWeekProgress() {
+  const weekIds = ['s1','s2','s3','s4','s5','s6','s7','s89','s1012','s1314','sp-web','sp-mobile','sp-cyber','s2326'];
+  weekIds.forEach(id => {
+    const body = document.getElementById('wbody-' + id);
+    if (!body) return;
+    const checks = body.querySelectorAll('.check-box');
+    const done = [...checks].filter(c => c.classList.contains('done')).length;
+    const prog = document.getElementById('wprog-' + id);
+    if (prog && checks.length > 0) {
+      prog.textContent = done + '/' + checks.length;
+      if (done === checks.length) {
+        prog.className = 'week-progress';
+        prog.innerHTML = '<span class="week-done-badge">✓ Terminé</span>';
+      }
+    }
+  });
+}
+
+// ===== Navigation =====
+const allSections = ['phase1','phase2','phase3','phase4','phase5','phase6','phase7','guide-voie','guide-ia'];
+
+function showSection(id) {
+  allSections.forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.toggle('active', s === id);
+    const nav = document.getElementById('nav-' + s);
+    if (nav) nav.classList.toggle('active', s === id);
+  });
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ===== Week accordion =====
+function toggleWeek(id) {
+  const body = document.getElementById('wbody-' + id);
+  const arrow = document.getElementById('warr-' + id);
+  if (!body) return;
+  const isOpen = body.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open', isOpen);
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ===== Voie select =====
+function saveVoie(v) {
+  data['voie'] = v;
+  saveData(data);
+  showToast('Spécialisation sauvegardée !');
+}
+
+function restoreVoie() {
+  if (data['voie']) {
+    document.getElementById('voie-select').value = data['voie'];
+  }
+}
+
+// ===== Start date =====
+function initStartDate() {
+  if (!data['start_date']) {
+    data['start_date'] = new Date().toISOString().split('T')[0];
+    saveData(data);
+  }
+  const start = new Date(data['start_date']);
+  const now = new Date();
+  const days = Math.floor((now - start) / 86400000);
+  document.getElementById('stat-days').textContent = days;
+
+  const opts = {year:'numeric', month:'long', day:'numeric'};
+  const sidebarDate = document.getElementById('sidebar-date');
+  if (sidebarDate) sidebarDate.textContent = 'Débuté le ' + start.toLocaleDateString('fr-FR', opts);
+}
+
+// ===== Init =====
+restoreChecks();
+restoreVoie();
+initStartDate();
+updateStats();
+</script>
+
+</body>
+</html>
